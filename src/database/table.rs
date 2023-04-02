@@ -18,16 +18,16 @@ impl Table {
     Table { indexes: vec![], rows: HashMap::new(), name: name.to_string(), pk_key: pk_key.to_string() }
   }
 
-  pub fn from_file(file_path: String) -> Table {
+  pub fn from_file(file_path: String) -> Result<Table, &'static str> {
     let serialized = fs::read_to_string(file_path);
     if serialized.is_err() {
-      panic!("Failed loading from file");
+      return Err("Failed loading from file");
     }
     let table: Table = serde_json::from_str(&serialized.unwrap()).unwrap();
-    return table;
+    return Ok(table);
   }
   
-  pub fn to_file(&self, file_path: String) {
+  pub fn to_file(&self, file_path: &'static str) {
 
     let serialized = serde_json::to_string(self).unwrap();
     println!("serialized = {}", serialized);
@@ -39,15 +39,16 @@ impl Table {
 
 
   pub fn create_index(&mut self, index: Index) {
+    // TODO: Add row indexes to the index itself before pushing to the table
     self.indexes.push(index)
   }
 
-  pub fn find_by_pk(&self, value: &u64) -> &Row {
+  pub fn find_by_pk(&self, value: &u64) -> Result<&Row, &'static str> {
     let row = self.rows.get(value);
     if row.is_none() {
-      panic!("Row not found!");
+      return Err("Row not found!");
     }
-    return row.unwrap().clone();
+    Ok(row.unwrap().clone())
   }
 
   pub fn insert_row(&mut self, row: Row) {
