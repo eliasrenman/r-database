@@ -18,26 +18,6 @@ impl Table {
     Table { indexes: vec![], rows: HashMap::new(), name: name.to_string(), pk_key: pk_key.to_string() }
   }
 
-  pub fn from_file(file_path: String) -> Result<Table, &'static str> {
-    let serialized = fs::read_to_string(file_path);
-    if serialized.is_err() {
-      return Err("Failed loading from file");
-    }
-    let table: Table = serde_json::from_str(&serialized.unwrap()).unwrap();
-    return Ok(table);
-  }
-  
-  pub fn to_file(&self, file_path: &'static str) {
-
-    let serialized = serde_json::to_string(self).unwrap();
-    println!("serialized = {}", serialized);
-    let result = fs::write(file_path, serialized);
-    if result.is_err() {
-      panic!("Failed writing table to file")
-    }
-  }
-
-
   pub fn create_index(&mut self, index: Index) {
     // TODO: Add row indexes to the index itself before pushing to the table
     self.indexes.push(index)
