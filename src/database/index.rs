@@ -42,11 +42,11 @@ impl Index {
         if index_row.is_none() {
             // Insert the new row into the index
             self.index_rows.insert(key, vec![pk_value]);
-            return Result::Ok(());
+            return Ok(());
         }
 
         if self.unique {
-            return Result::Err("Index is unique!");
+            return Err("Index is unique!");
         }
 
         let mut vector = index_row.unwrap().clone();
@@ -61,7 +61,7 @@ impl Index {
 
         self.index_rows.insert(key, vector);
 
-        return Result::Ok(());
+        return Ok(());
     }
 
     pub fn get_pks_by_value(&self, value: Value) -> Option<&Vec<u64>> {
