@@ -39,14 +39,14 @@ impl Database {
 
 #[cfg(test)]
 mod tests {
-    use crate::database::{row::Row, table::Table, Database};
+    use crate::database::{table::Table, Database};
     use std::{fs, path::Path};
 
     #[test]
     fn should_write_and_read_to_file() {
-        let mut table: Table = Table::new("Cats", "id");
-        table.insert_row(Row::new(hashmapJson!["id" => 1, "name" => "Ozzy"]));
-        table.insert_row(Row::new(hashmapJson!["id" => 2, "name" => "Simon"]));
+        let mut table: Table = Table::new("Cats", "id", None);
+        let _ = table.insert_row(row!["id" => 1, "name" => "Ozzy"]);
+        _ = table.insert_row(row!["id" => 2, "name" => "Simon"]);
         let database = Database::new(hashmap!["Cats" => table]);
 
         database.to_file("./db.json");
@@ -63,7 +63,7 @@ mod tests {
             panic!("Unable to find table");
         }
 
-        let row = table.unwrap().find_by_pk(&1u64);
+        let row = table.unwrap().find_by_pk(1u64);
         assert_eq!(row.is_ok(), true);
 
         // Cleanup file
