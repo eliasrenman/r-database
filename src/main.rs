@@ -1,4 +1,3 @@
-
 macro_rules! hashmapJson {
     ($( $key: expr => $val: expr ),*) => {{
          let mut map: ::std::collections::HashMap<String, ::serde_json::Value> = ::std::collections::HashMap::new();
@@ -17,8 +16,7 @@ macro_rules! hashmap {
 
 mod database;
 
-fn main() {
-}
+fn main() {}
 
 #[cfg(test)]
 mod tests;

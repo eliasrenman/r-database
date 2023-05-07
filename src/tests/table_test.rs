@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
 
-    use crate::database::{table::Table, row::Row};
+    use crate::database::{row::Row, table::Table};
 
     #[test]
     fn should_find_two_rows() {
@@ -29,6 +29,4 @@ mod tests {
         let row = table.find_by_pk(&3u64);
         assert_eq!(row.is_err(), true);
     }
-
-
 }

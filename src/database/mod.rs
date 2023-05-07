@@ -60,9 +60,8 @@ mod tests {
         let db = table.unwrap();
         let table = db.tables.get("Cats");
         if table.is_none() {
-          panic!("Unable to find table");
+            panic!("Unable to find table");
         }
-
 
         let row = table.unwrap().find_by_pk(&1u64);
         assert_eq!(row.is_ok(), true);
