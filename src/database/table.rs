@@ -28,17 +28,17 @@ impl Table {
         self.indexes.insert(key, index);
     }
 
-    pub fn insert_row(&mut self, row: Row) -> Result<(), &str> {
+    pub fn insert_row(&mut self, row: Row) -> Result<(), String> {
         let key_option = row.get(&self.pk);
 
         if key_option.is_none() {
-            panic!("Primary key not found on row to insert!");
+            return Err("Primary key not found on row to insert!".to_string());
         }
 
         let row_primary_key = key_option.unwrap().as_u64();
 
         if row_primary_key.is_none() {
-            panic!("Primary key is not of type u64");
+            return Err("Primary key is not of type u64".to_string());
         }
 
         // Insert row into database
@@ -52,10 +52,10 @@ impl Table {
                 Entry::Occupied(mut e) => {
                     let result = e.get_mut().insert_row(self.pk.clone(), row.clone());
                     if result.is_err() {
-                        panic!(
+                        return Err(format!(
                             "Failed writing to index with erro: {}",
                             result.err().unwrap()
-                        );
+                        ));
                     }
                 }
                 Entry::Vacant(_e) => {}
