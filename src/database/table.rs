@@ -1,4 +1,4 @@
-use super::{index::Index, row::Row};
+use super::{index::Index, relation::Relation, row::Row};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{
@@ -10,17 +10,24 @@ use std::{
 pub struct Table {
     indexes: HashMap<String, Index>,
     rows: HashMap<u64, Row>,
-    name: String,
+    pub name: String,
     pk: String,
+    relations: HashMap<String, Relation>,
 }
 
 impl Table {
-    pub fn new(name: &str, pk: &str, indexes: Option<HashMap<String, Index>>) -> Table {
+    pub fn new(
+        name: &str,
+        pk: &str,
+        indexes: Option<HashMap<String, Index>>,
+        relations: Option<HashMap<String, Relation>>,
+    ) -> Table {
         Table {
             indexes: indexes.unwrap_or(HashMap::new()),
             rows: HashMap::new(),
             name: name.to_string(),
             pk: pk.to_string(),
+            relations: relations.unwrap_or(HashMap::new()),
         }
     }
 
@@ -106,5 +113,13 @@ impl Table {
             .get_pks_by_value(value.clone())
             .unwrap()
             .clone());
+    }
+
+    pub fn get_relation(&self, name: &String) -> Result<&Relation, String> {
+        let relation = self.relations.get(name);
+        if relation.is_some() {
+            return Ok(relation.unwrap());
+        }
+        Err("Failed to find relation".to_string())
     }
 }

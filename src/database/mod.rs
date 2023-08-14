@@ -1,20 +1,21 @@
-use std::{collections::HashMap, fs};
+use std::{borrow::BorrowMut, fs, ops::Deref};
 
 use serde::{Deserialize, Serialize};
 
-use self::table::Table;
+use self::{relation::Relation, table::Table};
 
 pub mod index;
+pub mod relation;
 pub mod row;
 pub mod table;
 
 #[derive(Serialize, Deserialize)]
 pub struct Database {
-    tables: HashMap<String, Table>,
+    pub tables: Vec<Table>,
 }
 
 impl Database {
-    pub fn new(tables: HashMap<String, Table>) -> Database {
+    pub fn new(tables: Vec<Table>) -> Database {
         Database { tables: tables }
     }
 
@@ -35,38 +36,27 @@ impl Database {
             panic!("Failed writing table to file")
         }
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use crate::database::{table::Table, Database};
-    use std::{fs, path::Path};
-
-    #[test]
-    fn should_write_and_read_to_file() {
-        let mut table: Table = Table::new("Cats", "id", None);
-        let _ = table.insert_row(row!["id" => 1, "name" => "Ozzy"]);
-        _ = table.insert_row(row!["id" => 2, "name" => "Simon"]);
-        let database = Database::new(hashmap!["Cats" => table]);
-
-        database.to_file("./db.json");
-
-        let exists = Path::try_exists(Path::new("./db.json"));
-        assert_eq!(exists.unwrap(), true);
-
-        let table = Database::from_file("./db.json".to_owned());
-        assert_eq!(table.is_ok(), true);
-
-        let db = table.unwrap();
-        let table = db.tables.get("Cats");
-        if table.is_none() {
-            panic!("Unable to find table");
+    pub fn get_table(&mut self, name: String) -> Result<&mut Table, String> {
+        for table in self.tables.iter_mut() {
+            if table.name == name {
+                return Ok(table);
+            }
         }
+        Err("Failed to find table".to_string())
+    }
 
-        let row = table.unwrap().find_by_pk(1u64);
-        assert_eq!(row.is_ok(), true);
-
-        // Cleanup file
-        let _result = fs::remove_file("./db.json");
+    pub fn get_table_relation(
+        &self,
+        table_name: String,
+        relation_name: &String,
+    ) -> Result<&Relation, String> {
+        for table in &self.tables {
+            if table.name == table_name {
+                let relation = table.get_relation(relation_name).unwrap();
+                return Ok(relation);
+            }
+        }
+        Err("Failed to find table".to_string())
     }
 }

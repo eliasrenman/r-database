@@ -5,7 +5,7 @@ mod table_test {
 
     #[test]
     fn should_find_two_rows() {
-        let mut table: Table = Table::new("Cats", "id", None);
+        let mut table: Table = Table::new("Cats", "id", None, None);
         let _ = table.insert_row(row!["id" => 1, "name" => "Ozzy"]);
         _ = table.insert_row(row!["id" => 2, "name" => "Simon"]);
 
@@ -22,7 +22,7 @@ mod table_test {
 
     #[test]
     fn should_fail_to_find_row() {
-        let mut table: Table = Table::new("Cats", "id", None);
+        let mut table: Table = Table::new("Cats", "id", None, None);
         let _ = table.insert_row(row!["id" => 1, "name" => "Ozzy"]);
         _ = table.insert_row(row!["id" => 2, "name" => "Simon"]);
 
@@ -32,7 +32,7 @@ mod table_test {
 
     #[test]
     fn should_fail_to_insert_row_with_same_id() {
-        let mut table: Table = Table::new("Cats", "id", None);
+        let mut table: Table = Table::new("Cats", "id", None, None);
         let _ = table.insert_row(row!["id" => 1, "name" => "Ozzy"]);
 
         // Make sure the rows actually exists

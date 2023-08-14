@@ -8,7 +8,7 @@ mod index_test {
     #[test]
     fn should_create_string_index_and_find_two_results() {
         let indexes = hashmap!["race" => Index::new("race".to_string(), Some(false), Some(false))];
-        let mut table: Table = Table::new("Cats", "id", Some(indexes));
+        let mut table: Table = Table::new("Cats", "id", Some(indexes), None);
         let _ = table.insert_row(row!["id" => 1, "name" => "Ozzy", "race" => "cat"]);
         _ = table.insert_row(row!["id" => 2, "name" => "Simon", "race" => "cat"]);
         _ = table.insert_row(row!["id" => 3, "name" => "Gosa", "race" => "dog"]);
@@ -33,7 +33,7 @@ mod index_test {
     #[test]
     fn should_create_reverse_index() {
         let indexes = hashmap!["race" => Index::new("race".to_string(), Some(true), Some(false))];
-        let mut table: Table = Table::new("Cats", "id", Some(indexes));
+        let mut table: Table = Table::new("Cats", "id", Some(indexes), None);
         let _ = table.insert_row(row!["id" => 1, "name" => "Ozzy", "race" => "cat"]);
         _ = table.insert_row(row!["id" => 2, "name" => "Simon", "race" => "cat"]);
         _ = table.insert_row(row!["id" => 3, "name" => "Gosa", "race" => "dog"]);
@@ -49,7 +49,7 @@ mod index_test {
     #[test]
     fn should_create_unique_index_and_fail_insert() {
         let indexes = hashmap!["race" => Index::new("race".to_string(), Some(false), Some(true))];
-        let mut table: Table = Table::new("Cats", "id", Some(indexes));
+        let mut table: Table = Table::new("Cats", "id", Some(indexes), None);
         let _ = table.insert_row(row!["id" => 1, "name" => "Ozzy", "race" => "cat"]);
         _ = table.insert_row(row!["id" => 3, "name" => "Gosa", "race" => "dog"]);
 
@@ -60,7 +60,7 @@ mod index_test {
     #[test]
     fn should_create_unique_index() {
         let indexes = hashmap!["race" => Index::new("race".to_string(), Some(false), Some(true))];
-        let mut table: Table = Table::new("Cats", "id", Some(indexes));
+        let mut table: Table = Table::new("Cats", "id", Some(indexes), None);
         let _ = table.insert_row(row!["id" => 1, "name" => "Ozzy", "race" => "cat"]);
         _ = table.insert_row(row!["id" => 3, "name" => "Gosa", "race" => "dog"]);
 
