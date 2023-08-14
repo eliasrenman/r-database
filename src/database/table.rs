@@ -1,7 +1,10 @@
 use super::{index::Index, row::Row};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::{hash_map::Entry, HashMap};
+use std::{
+    borrow::Borrow,
+    collections::{hash_map::Entry, HashMap},
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct Table {
@@ -39,6 +42,10 @@ impl Table {
 
         if row_primary_key.is_none() {
             return Err("Primary key is not of type u64".to_string());
+        }
+
+        if self.rows.contains_key(row_primary_key.unwrap().borrow()) {
+            return Err("Primary key already exists".to_string());
         }
 
         // Insert row into database
