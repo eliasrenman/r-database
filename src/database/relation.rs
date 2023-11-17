@@ -1,10 +1,8 @@
-use std::{borrow::BorrowMut, cell::RefCell, ops::DerefMut};
-
 use super::{row::Row, table::Table, Database};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Relation {
     pub table_name: String,
     variation: String,
@@ -46,18 +44,24 @@ impl OneToOne {
     }
 
     pub fn get(&self, table_name: String, database: &mut Database) -> Result<Row, String> {
-        let relation: Relation = {
+        let relation_result: Result<&Relation, String> = {
             // Get table
-            let table: &mut Table = database.get_table(table_name).unwrap();
+            let table: &mut Table = match database.get_table(table_name) {
+                Ok(relation) => relation,
+                Err(error) => return Err(error),
+            };
 
             // Fetch the Relation
-            table.get_relation(&self.relation_name).unwrap().clone()
+            table.get_relation(&self.relation_name)
         };
-        // Fetch row from foreign table
-        let foreign_row = relation.get_foreign_row(database, self.foreign_id)?;
-        // Now you can continue using 'relation' or anything else
 
-        Ok(foreign_row)
+        let relation: Relation = match relation_result {
+            Ok(relation) => relation.clone(),
+            Err(error) => return Err(error),
+        };
+
+        // Fetch row from foreign table
+        relation.get_foreign_row(database, self.foreign_id)
     }
 
     pub fn from_value(value: Value) -> OneToOne {
