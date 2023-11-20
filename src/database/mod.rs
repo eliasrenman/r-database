@@ -8,6 +8,8 @@ pub mod index;
 pub mod relation;
 pub mod row;
 pub mod table;
+pub mod select_processor;
+pub mod query_builder;
 
 #[derive(Serialize, Deserialize)]
 pub struct Database {
@@ -37,13 +39,21 @@ impl Database {
         }
     }
 
-    pub fn get_table(&mut self, name: String) -> Result<&mut Table, String> {
-        for table in self.tables.iter_mut() {
+    pub fn get_table(&self, name: String) -> Result<&Table, String> {
+        for table in self.tables.iter() {
             if table.name == name {
                 return Ok(table);
             }
         }
         Err("Failed to find table".to_string())
+    }
+    pub fn get_table_mut(&mut self, name: String) -> Result<&mut Table, String> {
+      for table in self.tables.iter_mut() {
+        if table.name == name {
+          return Ok(table);
+        }
+      }
+    Err("Failed to find table".to_string())
     }
 
     pub fn get_table_relation(

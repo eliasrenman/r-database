@@ -115,11 +115,12 @@ impl Table {
             .clone());
     }
 
-    pub fn get_relation(&self, name: &String) -> Result<&Relation, String> {
-        let relation = self.relations.get(name);
-        if relation.is_some() {
+    pub fn get_relation(&self, column_name: &String) -> Result<&Relation, String> {
+        let relation = self.relations.get(column_name);
+
+        if !relation.is_none() {
             return Ok(relation.unwrap());
         }
-        Err("Failed to find relation".to_string())
+      Err(format!("Failed to find relation, '{column_name}'").to_string())
     }
 }

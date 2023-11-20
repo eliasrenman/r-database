@@ -5,7 +5,7 @@ use serde_json::Value;
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Relation {
     pub table_name: String,
-    variation: String,
+    pub variation: String,
 }
 impl Relation {
     pub fn new(table_name: String, variation: String) -> Relation {
@@ -15,7 +15,7 @@ impl Relation {
         }
     }
 
-    pub fn get_foreign_row(&self, database: &mut Database, foreign_id: u64) -> Result<Row, String> {
+    pub fn get_foreign_row(&self, database: &Database, foreign_id: u64) -> Result<Row, String> {
         // Find foreign table
         let table = database.get_table(self.table_name.clone()).unwrap();
         // Get row from foreign table
@@ -43,10 +43,10 @@ impl OneToOne {
         self.foreign_id
     }
 
-    pub fn get(&self, table_name: String, database: &mut Database) -> Result<Row, String> {
+    pub fn get(&self, table_name: String, database: &Database) -> Result<Row, String> {
         let relation_result: Result<&Relation, String> = {
             // Get table
-            let table: &mut Table = match database.get_table(table_name) {
+            let table: &Table = match database.get_table(table_name) {
                 Ok(relation) => relation,
                 Err(error) => return Err(error),
             };
@@ -86,9 +86,9 @@ impl OneToMany {
         self.foreign_ids.clone()
     }
 
-    pub fn get(&self, table_name: String, database: &mut Database) -> Result<Vec<Row>, String> {
+    pub fn get(&self, table_name: String, database: &Database) -> Result<Vec<Row>, String> {
         let relation_result: Result<&Relation, String> = {
-            let table: &mut Table = match database.get_table(table_name) {
+            let table: &Table = match database.get_table(table_name) {
                 Ok(relation) => relation,
                 Err(error) => return Err(error),
             };
