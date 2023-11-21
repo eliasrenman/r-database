@@ -88,4 +88,25 @@ mod select_processor_test {
                  })
         );
     }
+
+    #[test]
+    fn should_parse_node() {
+      let output = SelectProcessor::recursive_parse_select(vec!["id","food","relation.*","relation.food.*"]);
+      let json = serde_json::to_string_pretty(&output).unwrap();
+      println!("{json}");
+      assert_json_include!(
+        actual: &output,
+            expected:
+                &json!({
+                "id": "id",
+                "food": "food",
+                "relation": {
+                  "*": "*",
+                  "food": {
+                    "*": "*"
+                  }
+                }
+                })
+        );
+    }
 }
