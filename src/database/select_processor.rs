@@ -16,7 +16,7 @@ impl SelectProcessor {
         table_name: &String,
         row: &Row,
         select: Vec<&str>,
-    ) -> HashMap<String, Value> {
+    ) -> Map<String, Value> {
         let asd = SelectProcessor::parse_node(select);
         println!("Debugging parsed selector {asd}");
         SelectProcessor::recursive_traverse_resolver(database, table_name, row, &asd)
@@ -27,20 +27,20 @@ impl SelectProcessor {
         table_name: &String,
         row: &Row,
         selector: &Value,
-    ) -> HashMap<String, Value> {
+    ) -> Map<String, Value> {
         let object = selector.as_object().unwrap();
-        let mut output: HashMap<String, Value> = HashMap::new();
+        let mut output: Map<String, Value> = Map::new();
         for (key, value) in object.into_iter() {
             if value.is_object() {
                 let relation_rows: Value =
                     SelectProcessor::resolve_relation(database, table_name, row, key);
 
                 if relation_rows.is_array() {
-                  let mut row_vec: Vec<HashMap<String, Value>> = vec![];
-                  for row in relation_rows.as_array().unwrap() {
-                    let asd = Row::from(row.as_object().unwrap());
-                    let parsed_row = SelectProcessor::recursive_traverse_resolver(
-                      database, table_name, &(row.as_object().unwrap()), &value,
+                    let mut row_vec: Vec<Map<String, Value>> = vec![];
+                    for row in relation_rows.as_array().unwrap() {
+                        let asd = row.as_object().unwrap();
+                        let parsed_row = SelectProcessor::recursive_traverse_resolver(
+                            database, table_name, &asd, &value,
                         );
                         row_vec.push(parsed_row);
                     }

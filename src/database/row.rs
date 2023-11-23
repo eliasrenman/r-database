@@ -1,4 +1,3 @@
-use serde_json::Value;
-use std::collections::HashMap;
+use serde_json::{Map, Value};
 
-pub type Row = HashMap<String, Value>;
+pub type Row = Map<String, Value>;

@@ -1,6 +1,6 @@
 macro_rules! row {
     ($( $key: expr => $val: expr ),*) => {{
-         let mut map: crate::database::row::Row = ::std::collections::HashMap::new();
+      let mut map: crate::database::row::Row = serde_json::Map::new();
          $( map.insert($key.to_string(), serde_json::to_value($val).unwrap()); )*
          map
     }}
