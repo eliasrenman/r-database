@@ -10,7 +10,6 @@ mod select_processor_test {
     };
     use assert_json_diff::assert_json_include;
     use serde_json::json;
-    use std::collections::HashMap;
 
     pub fn initialize() -> Database {
         let cat_relations =
@@ -39,9 +38,8 @@ mod select_processor_test {
 
         let cat_table = database.get_table("Cats".to_string()).unwrap();
         let cat_1 = cat_table.find_by_pk(1u64).unwrap();
-        let select = vec!["id".to_string(), "name".to_string(), "foods.*".to_string()];
-        let output =
-            SelectProcessor::selector(&database, &cat_table.name, cat_1, select, HashMap::new());
+        let select = vec!["id", "name", "foods.*"];
+        let output = SelectProcessor::selector(&database, &cat_table.name, cat_1, select);
         assert_json_include!(
             actual: &output,
             expected:
@@ -59,9 +57,8 @@ mod select_processor_test {
 
         let cat_table = database.get_table("Cats".to_string()).unwrap();
         let cat_1 = cat_table.find_by_pk(1u64).unwrap();
-        let select = vec!["id".to_string(), "name".to_string(), "breed".to_string()];
-        let output =
-            SelectProcessor::selector(&database, &cat_table.name, cat_1, select, HashMap::new());
+        let select = vec!["id", "name", "breed"];
+        let output = SelectProcessor::selector(&database, &cat_table.name, cat_1, select);
         assert_json_include!(
             actual: &output,
             expected: &row!["id" => 1, "name" =>"Ozzy", "breed" => "mixed"]
@@ -73,9 +70,8 @@ mod select_processor_test {
 
         let cat_table = database.get_table("Cats".to_string()).unwrap();
         let cat_1 = cat_table.find_by_pk(1u64).unwrap();
-        let select = vec!["*".to_string()];
-        let output =
-            SelectProcessor::selector(&database, &cat_table.name, cat_1, select, HashMap::new());
+        let select = vec!["*"];
+        let output = SelectProcessor::selector(&database, &cat_table.name, cat_1, select);
 
         assert_json_include!(
             actual: &output,
@@ -91,22 +87,37 @@ mod select_processor_test {
 
     #[test]
     fn should_parse_node() {
-      let output = SelectProcessor::recursive_parse_select(vec!["id","food","relation.*","relation.food.*"]);
-      let json = serde_json::to_string_pretty(&output).unwrap();
-      println!("{json}");
-      assert_json_include!(
-        actual: &output,
-            expected:
-                &json!({
-                "id": "id",
-                "food": "food",
-                "relation": {
-                  "*": "*",
-                  "food": {
-                    "*": "*"
-                  }
-                }
-                })
+        let output =
+            SelectProcessor::parse_node(vec!["id", "food", "relation.*", "relation.food.*"]);
+        let json = serde_json::to_string_pretty(&output).unwrap();
+        assert_json_include!(
+            actual: &output,
+            expected: &json!({
+             "id": "id",
+             "food": "food",
+             "relation": {
+               "*": "*",
+               "food": {
+                 "*": "*"
+               }
+             }
+             })
+        );
+    }
+    #[test]
+    fn should_parse_node_one_level() {
+        let output = SelectProcessor::parse_node(vec!["id", "name", "foods.*"]);
+        let json = serde_json::to_string_pretty(&output).unwrap();
+        println!("{json}");
+        assert_json_include!(
+            actual: &output,
+            expected: &json!({
+             "id": "id",
+             "name":"name",
+             "foods": {
+               "*": "*",
+             }
+             })
         );
     }
 }
