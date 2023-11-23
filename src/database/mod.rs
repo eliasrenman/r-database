@@ -8,8 +8,8 @@ pub mod index;
 pub mod relation;
 pub mod row;
 pub mod table;
-pub mod select_processor;
-pub mod query_builder;
+pub mod query;
+
 
 #[derive(Serialize, Deserialize)]
 pub struct Database {

@@ -1,10 +1,7 @@
-use std::collections::HashMap;
-
 use serde_json::{json, Map, Value};
 
-use crate::database::relation::{OneToMany, OneToOne};
+use crate::database::{relation::{OneToMany, OneToOne}, Database, row::Row, query::select_parser::SelectParser};
 
-use super::{row::Row, Database};
 
 pub struct SelectProcessor {}
 
@@ -17,7 +14,7 @@ impl SelectProcessor {
         row: &Row,
         select: Vec<&str>,
     ) -> Map<String, Value> {
-        let asd = SelectProcessor::parse_node(select);
+        let asd = SelectParser::parse_selector_recursive(select);
         println!("Debugging parsed selector {asd}");
         SelectProcessor::recursive_traverse_resolver(database, table_name, row, &asd)
     }
@@ -46,8 +43,9 @@ impl SelectProcessor {
                     }
                     output.insert(key.to_owned(), json!(row_vec));
                 } else {
+                  let foreign_row = relation_rows.as_object().unwrap();
                     let parsed_row = SelectProcessor::recursive_traverse_resolver(
-                        database, table_name, &row, &value,
+                      database, table_name, foreign_row, &value,
                     );
 
                     output.insert(key.to_owned(), json!(parsed_row));
@@ -100,29 +98,5 @@ impl SelectProcessor {
 
     fn is_valid_key(key: &str) -> bool {
         key.chars().all(|c| c.is_ascii_lowercase() || c == '_')
-    }
-
-    pub fn parse_node(node: Vec<&str>) -> Value {
-        let mut output = Map::new();
-
-        for key in node {
-            if let Some(dot_index) = key.find('.') {
-                let next_key = key[..dot_index].to_string();
-                let next_node = key[dot_index + 1..].to_string();
-
-                let mut nested_value = SelectProcessor::parse_node(vec![&next_node]);
-
-                if output.contains_key(&next_key) {
-                    let current_value = output.get_mut(&next_key).unwrap().as_object_mut().unwrap();
-                    current_value.append(nested_value.as_object_mut().unwrap());
-                } else {
-                    output.insert(next_key, nested_value);
-                }
-            } else {
-                output.insert(key.to_string(), json!(key));
-            }
-        }
-
-        json!(output)
     }
 }
